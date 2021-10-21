@@ -10,4 +10,3 @@ export interface CurrentUserInterface {
   role: string
   pseudonym: string | null
 }
-

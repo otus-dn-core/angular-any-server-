@@ -3,8 +3,10 @@ import {FormGroup, FormBuilder, Validators} from '@angular/forms'
 import {Store, select} from '@ngrx/store'
 import {Observable} from 'rxjs'
 
-import {registerAction} from 'src/app/auth/store/actions'
+import {registerAction} from 'src/app/auth/store/actions/register.action'
 import {isSubmittingSelector} from 'src/app/auth/store/selectors'
+import {AuthService} from "../../services/auth.service";
+import {RegisterRequestInterface} from "../../types/registerRequest.interface";
 
 @Component({
   selector: 'mc-register',
@@ -15,7 +17,7 @@ export class RegisterComponent implements OnInit {
   form: FormGroup
   isSubmitting$: Observable<boolean>
 
-  constructor(private fb: FormBuilder, private store: Store) {}
+  constructor(private fb: FormBuilder, private store: Store, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.initializeForm()
@@ -24,11 +26,11 @@ export class RegisterComponent implements OnInit {
 
   initializeValues(): void {
     this.isSubmitting$ = this.store.pipe(select(isSubmittingSelector));
-    console.log("this.isSubmitting$: ", this.isSubmitting$)
+    // console.log("this.isSubmitting$: ", this.isSubmitting$)
   }
 
   initializeForm(): void {
-    console.log('initializeForm')
+    // console.log('initializeForm')
     this.form = this.fb.group({
       username: ['', Validators.required],
       email: ['', Validators.required],
@@ -38,6 +40,12 @@ export class RegisterComponent implements OnInit {
 
   onSubmit(): void {
     console.log('submit', this.form.value, this.form.valid)
-    this.store.dispatch(registerAction(this.form.value))
+    const request: RegisterRequestInterface = {
+      user: this.form.value
+    }
+    this.store.dispatch(registerAction({request}))
+    // this.authService.register({user: this.form.value}).subscribe((currentUser) => {
+    //   console.log('//// CURRENT USER: ', currentUser)
+    // })
   }
 }
