@@ -4,9 +4,10 @@ import {Store, select} from '@ngrx/store'
 import {Observable} from 'rxjs'
 
 import {registerAction} from 'src/app/auth/store/actions/register.action'
-import {isSubmittingSelector} from 'src/app/auth/store/selectors'
+import {isSubmittingSelector, validationErrorsSelector} from 'src/app/auth/store/selectors'
 import {AuthService} from "../../services/auth.service";
 import {RegisterRequestInterface} from "../../types/registerRequest.interface";
+import {BackendErrorsInterface} from "../../../shared/types/backendErrors.interface";
 
 @Component({
   selector: 'mc-register',
@@ -16,8 +17,11 @@ import {RegisterRequestInterface} from "../../types/registerRequest.interface";
 export class RegisterComponent implements OnInit {
   form: FormGroup
   isSubmitting$: Observable<boolean>
+  // backendErrors$: Observable<BackendErrorsInterface | null>
+  backendErrors$: Observable<string[] | null>
 
-  constructor(private fb: FormBuilder, private store: Store, private authService: AuthService) {}
+  // constructor(private fb: FormBuilder, private store: Store, private authService: AuthService) {}
+  constructor(private fb: FormBuilder, private store: Store) {}
 
   ngOnInit(): void {
     this.initializeForm()
@@ -26,7 +30,7 @@ export class RegisterComponent implements OnInit {
 
   initializeValues(): void {
     this.isSubmitting$ = this.store.pipe(select(isSubmittingSelector));
-    // console.log("this.isSubmitting$: ", this.isSubmitting$)
+    this.backendErrors$ = this.store.pipe(select(validationErrorsSelector));
   }
 
   initializeForm(): void {
@@ -39,7 +43,7 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('submit', this.form.value, this.form.valid)
+    // console.log('submit', this.form.value, this.form.valid)
     const request: RegisterRequestInterface = {
       user: this.form.value
     }
